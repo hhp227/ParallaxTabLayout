@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+            android:id="@+id/navigationFind"
+            android:icon="@drawable/ic_launcher_foreground"
+            android:title="그룹찾기" />
+
+    <item
+            android:id="@+id/navigationRequest"
+            android:icon="@drawable/ic_launcher_foreground"
+            android:title="가입신청중 그룹" />
+
+    <item
+            android:id="@+id/navigationCreate"
+            android:icon="@drawable/ic_launcher_foreground"
+            android:title="그룹만들기" />
+
+</menu>

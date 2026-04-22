@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/nav_graph.xml"
+            app:startDestination="@id/mainFragment">
+
+    <fragment
+            android:id="@+id/mainFragment"
+            android:name="com.hhp227.parallaxlayout.MainFragment"
+            android:label="fragment_main"
+            tools:layout="@layout/fragment_main">
+        <action
+                android:id="@+id/action_mainFragment_to_detailFragment"
+                app:destination="@id/detailFragment" />
+        <action
+                android:id="@+id/action_mainFragment_to_parallaxTabFragment"
+                app:destination="@id/parallaxTabFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/detailFragment"
+            android:name="com.hhp227.parallaxlayout.fragment.detail.DetailFragment"
+            android:label="Detail"
+            tools:layout="@layout/fragment_detail" >
+    </fragment>
+    <fragment
+            android:id="@+id/parallaxTabFragment"
+            android:name="com.hhp227.parallaxlayout.fragment.tab.ParallaxTabFragment"
+            android:label="ParallaxTabFragment"
+            tools:layout="@layout/fragment_parallax_tab" >
+    </fragment>
+
+</navigation>
