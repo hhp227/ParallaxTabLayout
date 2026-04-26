@@ -9,7 +9,7 @@ struct SecondTabScreen: View {
 
     var body: some View {
         ScrollView {
-            ScrollOffsetReader()
+            ScrollOffsetReader(isEnabled: isActive)
             LazyVStack(spacing: 0) {
                 ForEach(viewModel.items, id: \.self) { item in
                     Text(item)

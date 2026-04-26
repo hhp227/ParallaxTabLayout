@@ -13,18 +13,19 @@ struct ParallaxNavHost: View {
     var body: some View {
         NavigationView {
             ZStack {
-                switch selectedDestination {
-                case .first:
-                    FirstScreen(
-                        selectedDestination: $selectedDestination,
-                        onOpenDetail: { isDetailActive = true }
-                    )
-                case .second:
-                    SecondScreen(
-                        selectedDestination: $selectedDestination,
-                        onOpenParallaxTab: { parallaxTabTitle = $0 }
-                    )
-                }
+                FirstScreen(
+                    selectedDestination: $selectedDestination,
+                    onOpenDetail: { isDetailActive = true }
+                )
+                .opacity(selectedDestination == .first ? 1 : 0)
+                .allowsHitTesting(selectedDestination == .first)
+
+                SecondScreen(
+                    selectedDestination: $selectedDestination,
+                    onOpenParallaxTab: { parallaxTabTitle = $0 }
+                )
+                .opacity(selectedDestination == .second ? 1 : 0)
+                .allowsHitTesting(selectedDestination == .second)
 
                 NavigationLink(
                     destination: DetailScreen(),

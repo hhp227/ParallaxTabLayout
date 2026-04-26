@@ -12,7 +12,8 @@ struct FirstTabScreen: View {
         RefreshableLazyColumn(
             items: viewModel.items,
             headerHeight: headerHeight,
-            isRefreshEnabled: isRefreshEnabled
+            isRefreshEnabled: isRefreshEnabled,
+            isScrollTrackingEnabled: isActive
         ) { item in
             Text(item)
                 .frame(maxWidth: .infinity, alignment: .leading)

@@ -101,6 +101,7 @@ private struct HeaderView: View {
             }
         }
         .frame(height: headerHeight)
+        .clipped()
     }
 }
 
