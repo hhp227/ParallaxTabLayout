@@ -21,10 +21,11 @@ struct RefreshableLazyColumn<Row: View>: View {
 
     private var content: some View {
         ScrollView {
-            ScrollOffsetReader(isEnabled: isScrollTrackingEnabled)
             LazyVStack(spacing: 0) {
-                Color.clear
-                    .frame(height: headerHeight)
+                CollapsingHeaderSpacer(
+                    height: headerHeight,
+                    isScrollTrackingEnabled: isScrollTrackingEnabled
+                )
                 ForEach(items, id: \.self) { item in
                     row(item)
                 }
@@ -45,25 +46,5 @@ struct RefreshableLazyColumn<Row: View>: View {
         self.isRefreshEnabled = isRefreshEnabled
         self.isScrollTrackingEnabled = isScrollTrackingEnabled
         self.row = row
-    }
-}
-
-struct ScrollOffsetReader: View {
-    var isEnabled = true
-
-    var body: some View {
-        Group {
-            if isEnabled {
-                GeometryReader { proxy in
-                    Color.clear.preference(
-                        key: ScrollOffsetPreferenceKey.self,
-                        value: proxy.frame(in: .named(collapsingScrollCoordinateSpace)).minY
-                    )
-                }
-            } else {
-                Color.clear
-            }
-        }
-        .frame(height: 0)
     }
 }

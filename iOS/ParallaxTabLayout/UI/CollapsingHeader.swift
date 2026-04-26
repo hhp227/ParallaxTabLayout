@@ -24,6 +24,7 @@ struct CollapsingListScaffold<Content: View>: View {
     var body: some View {
         GeometryReader { proxy in
             let topInset = proxy.safeAreaInsets.top
+            let headerTop = proxy.frame(in: .global).minY
             let expandedHeight = topInset + imageHeight
             let collapsedHeight = topInset + toolbarHeight + (showTabs ? tabHeight : 0)
             let maxCollapse = max(0, expandedHeight - collapsedHeight)
@@ -39,8 +40,12 @@ struct CollapsingListScaffold<Content: View>: View {
 
             ZStack(alignment: .top) {
                 content(expandedHeight, appBarState)
-                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
-                        collapseOffset = min(max(-offset, 0), maxCollapse)
+                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { itemTop in
+                        guard !itemTop.isNaN else { return }
+
+                        let expandedHeaderBottom = headerTop + expandedHeight
+                        let scrolledOffset = max(expandedHeaderBottom - itemTop, 0)
+                        collapseOffset = min(scrolledOffset, maxCollapse)
                     }
 
                 HeaderView(
@@ -140,9 +145,37 @@ private struct TabButton: View {
 }
 
 struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
+    static var defaultValue: CGFloat = .nan
 
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
+        let next = nextValue()
+        if !next.isNaN {
+            value = next
+        }
+    }
+}
+
+struct CollapsingHeaderSpacer: View {
+    let height: CGFloat
+    var isScrollTrackingEnabled = true
+
+    var body: some View {
+        Group {
+            if isScrollTrackingEnabled {
+                Color.clear
+                    .frame(height: height)
+                    .background(
+                        GeometryReader { proxy in
+                            Color.clear.preference(
+                                key: ScrollOffsetPreferenceKey.self,
+                                value: proxy.frame(in: .global).maxY
+                            )
+                        }
+                    )
+            } else {
+                Color.clear
+                    .frame(height: height)
+            }
+        }
     }
 }
