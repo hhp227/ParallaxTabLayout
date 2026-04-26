@@ -29,6 +29,18 @@ struct RefreshableLazyColumn<Row: View>: View {
             .padding(.top, headerHeight)
         }
     }
+
+    init(
+        items: [String],
+        headerHeight: CGFloat,
+        isRefreshEnabled: Bool,
+        @ViewBuilder row: @escaping (String) -> Row
+    ) {
+        self.items = items
+        self.headerHeight = headerHeight
+        self.isRefreshEnabled = isRefreshEnabled
+        self.row = row
+    }
 }
 
 struct ScrollOffsetReader: View {
