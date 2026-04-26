@@ -25,10 +25,12 @@ struct AppToolbar: View {
                     .frame(width: 56, height: 56)
             }
 
-            Text(title)
-                .font(.title3.weight(.medium))
-                .lineLimit(1)
-                .foregroundColorCompat(Color.white)
+            if navigationIcon == .menu {
+                Text(title)
+                    .font(.title3.weight(.medium))
+                    .lineLimit(1)
+                    .foregroundColorCompat(Color.white)
+            }
 
             Spacer()
         }

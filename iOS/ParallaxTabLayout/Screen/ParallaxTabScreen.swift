@@ -11,7 +11,7 @@ struct ParallaxTabScreen: View {
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             CollapsingListScaffold(
-                title: "",
+                title: title,
                 navigationIcon: .back,
                 onNavigationClick: {},
                 showTabs: true,
@@ -44,7 +44,7 @@ struct ParallaxTabScreen: View {
                     .padding(16)
             }
         }
-        .navigationTitle("")
+        .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }
 
