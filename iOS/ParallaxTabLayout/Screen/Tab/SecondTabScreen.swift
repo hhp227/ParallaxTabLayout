@@ -11,6 +11,8 @@ struct SecondTabScreen: View {
         ScrollView {
             ScrollOffsetReader(isEnabled: isActive)
             LazyVStack(spacing: 0) {
+                Color.clear
+                    .frame(height: headerHeight)
                 ForEach(viewModel.items, id: \.self) { item in
                     Text(item)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -20,7 +22,6 @@ struct SecondTabScreen: View {
                     Divider()
                 }
             }
-            .padding(.top, headerHeight)
         }
         .coordinateSpace(name: collapsingScrollCoordinateSpace)
         .onPreferenceChange(ScrollOffsetPreferenceKey.self) {

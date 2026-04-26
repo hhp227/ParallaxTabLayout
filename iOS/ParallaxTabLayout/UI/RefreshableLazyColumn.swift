@@ -23,11 +23,12 @@ struct RefreshableLazyColumn<Row: View>: View {
         ScrollView {
             ScrollOffsetReader(isEnabled: isScrollTrackingEnabled)
             LazyVStack(spacing: 0) {
+                Color.clear
+                    .frame(height: headerHeight)
                 ForEach(items, id: \.self) { item in
                     row(item)
                 }
             }
-            .padding(.top, headerHeight)
         }
         .coordinateSpace(name: collapsingScrollCoordinateSpace)
     }
