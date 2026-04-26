@@ -17,8 +17,6 @@ struct CollapsingListScaffold<Content: View>: View {
     let onTabSelected: (Int) -> Void
     let content: (_ headerHeight: CGFloat, _ appBarState: CollapsingAppBarState) -> Content
 
-    @State private var initialScrollMinY: CGFloat?
-
     private let imageHeight: CGFloat = 256
     private let toolbarHeight: CGFloat = 56
     private let tabHeight: CGFloat = 48
@@ -26,6 +24,7 @@ struct CollapsingListScaffold<Content: View>: View {
     var body: some View {
         GeometryReader { proxy in
             let topInset = proxy.safeAreaInsets.top
+            let headerTop = proxy.frame(in: .global).minY
             let expandedHeight = topInset + imageHeight
             let collapsedHeight = topInset + toolbarHeight + (showTabs ? tabHeight : 0)
             let maxCollapse = max(0, expandedHeight - collapsedHeight)
@@ -41,14 +40,11 @@ struct CollapsingListScaffold<Content: View>: View {
 
             ZStack(alignment: .top) {
                 content(expandedHeight, appBarState)
-                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { minY in
-                        guard !minY.isNaN else { return }
+                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { itemTop in
+                        guard !itemTop.isNaN else { return }
 
-                        if initialScrollMinY == nil {
-                            initialScrollMinY = minY
-                        }
-
-                        let scrolledOffset = max((initialScrollMinY ?? minY) - minY, 0)
+                        let expandedHeaderBottom = headerTop + expandedHeight
+                        let scrolledOffset = max(expandedHeaderBottom - itemTop, 0)
                         collapseOffset = min(scrolledOffset, maxCollapse)
                     }
 
@@ -172,7 +168,7 @@ struct CollapsingHeaderSpacer: View {
                         GeometryReader { proxy in
                             Color.clear.preference(
                                 key: ScrollOffsetPreferenceKey.self,
-                                value: proxy.frame(in: .global).minY
+                                value: proxy.frame(in: .global).maxY
                             )
                         }
                     )
