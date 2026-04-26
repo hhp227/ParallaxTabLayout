@@ -19,6 +19,7 @@ struct CollapsingListScaffold<Content: View>: View {
 
     @State private var ignoresNextExpansion = false
     @State private var scrollOffset: CGFloat = 0
+    @State private var prevRawOffset: CGFloat = 0
 
     private let imageHeight: CGFloat = 256
     private let toolbarHeight: CGFloat = 56
@@ -27,9 +28,8 @@ struct CollapsingListScaffold<Content: View>: View {
     var body: some View {
         GeometryReader { proxy in
             let topInset = proxy.safeAreaInsets.top
-            let collapsedToolbarHeight = navigationIcon == .back ? 0 : toolbarHeight
             let expandedHeight = topInset + imageHeight
-            let collapsedHeight = topInset + collapsedToolbarHeight + (showTabs ? tabHeight : 0)
+            let collapsedHeight = topInset + toolbarHeight + (showTabs ? tabHeight : 0)
             let maxCollapse = max(0, expandedHeight - collapsedHeight)
             let currentOffset = min(max(collapseOffset, 0), maxCollapse)
             let headerHeight = expandedHeight - currentOffset
@@ -47,16 +47,36 @@ struct CollapsingListScaffold<Content: View>: View {
                     .onPreferenceChange(ScrollOffsetPreferenceKey.self) { contentOffset in
                         guard !contentOffset.isNaN else { return }
 
-                        let scrolledOffset = max(-contentOffset, 0)
-                        scrollOffset = min(scrolledOffset, maxCollapse)
-                        let nextCollapseOffset = min(scrolledOffset, maxCollapse)
-                        if ignoresNextExpansion && nextCollapseOffset < collapseOffset {
+                        // rawOffset: positive = scrolled up, negative = bouncing past top
+                        let rawOffset = -contentOffset
+                        let newScrollOffset = min(max(rawOffset, 0), maxCollapse)
+
+                        if ignoresNextExpansion {
+                            scrollOffset = newScrollOffset
+                            prevRawOffset = rawOffset
                             ignoresNextExpansion = false
+                            // Normalize collapseOffset from infinity to maxCollapse
+                            if collapseOffset > maxCollapse {
+                                collapseOffset = maxCollapse
+                            }
                             return
                         }
 
-                        ignoresNextExpansion = false
-                        collapseOffset = nextCollapseOffset
+                        let delta = newScrollOffset - scrollOffset
+                        // Bounce delta: change in the bounce amount only (not mixed with scroll)
+                        let bounceDelta = min(rawOffset, 0) - min(prevRawOffset, 0)
+
+                        scrollOffset = newScrollOffset
+                        prevRawOffset = rawOffset
+
+                        if delta > 0 {
+                            // Scrolled further up: collapse header by delta
+                            collapseOffset = min(collapseOffset + delta, maxCollapse)
+                        } else if rawOffset < 0 && bounceDelta < 0 {
+                            // Bouncing past top and pulling harder: expand header
+                            collapseOffset = max(min(collapseOffset, maxCollapse) + bounceDelta, 0)
+                        }
+                        // delta <= 0 and not bouncing: list scrolling down, header stays collapsed
                     }
 
                 HeaderView(
@@ -74,6 +94,7 @@ struct CollapsingListScaffold<Content: View>: View {
             .ignoresSafeArea(edges: .top)
             .onChange(of: selectedTab) { _ in
                 ignoresNextExpansion = true
+                prevRawOffset = 0
             }
         }
     }
@@ -98,14 +119,12 @@ private struct HeaderView: View {
 
             VStack(spacing: 0) {
                 Color.clear.frame(height: topInset)
-                if navigationIcon == .menu {
-                    AppToolbar(
-                        title: title,
-                        navigationIcon: navigationIcon,
-                        onNavigationClick: onNavigationClick,
-                        transparent: true
-                    )
-                }
+                AppToolbar(
+                    title: title,
+                    navigationIcon: navigationIcon,
+                    onNavigationClick: onNavigationClick,
+                    transparent: true
+                )
                 Spacer(minLength: 0)
                 if showTabs {
                     HStack(spacing: 0) {
