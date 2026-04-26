@@ -17,6 +17,8 @@ struct CollapsingListScaffold<Content: View>: View {
     let onTabSelected: (Int) -> Void
     let content: (_ headerHeight: CGFloat, _ appBarState: CollapsingAppBarState) -> Content
 
+    @State private var initialScrollMinY: CGFloat?
+
     private let imageHeight: CGFloat = 256
     private let toolbarHeight: CGFloat = 56
     private let tabHeight: CGFloat = 48
@@ -39,8 +41,15 @@ struct CollapsingListScaffold<Content: View>: View {
 
             ZStack(alignment: .top) {
                 content(expandedHeight, appBarState)
-                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
-                        collapseOffset = min(max(-offset, 0), maxCollapse)
+                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { minY in
+                        guard !minY.isNaN else { return }
+
+                        if initialScrollMinY == nil {
+                            initialScrollMinY = minY
+                        }
+
+                        let scrolledOffset = max((initialScrollMinY ?? minY) - minY, 0)
+                        collapseOffset = min(scrolledOffset, maxCollapse)
                     }
 
                 HeaderView(
@@ -140,10 +149,13 @@ private struct TabButton: View {
 }
 
 struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
+    static var defaultValue: CGFloat = .nan
 
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
+        let next = nextValue()
+        if !next.isNaN {
+            value = next
+        }
     }
 }
 
@@ -152,15 +164,22 @@ struct CollapsingHeaderSpacer: View {
     var isScrollTrackingEnabled = true
 
     var body: some View {
-        Color.clear
-            .frame(height: height)
-            .background(
-                GeometryReader { proxy in
-                    Color.clear.preference(
-                        key: ScrollOffsetPreferenceKey.self,
-                        value: isScrollTrackingEnabled ? proxy.frame(in: .named(collapsingScrollCoordinateSpace)).minY : 0
+        Group {
+            if isScrollTrackingEnabled {
+                Color.clear
+                    .frame(height: height)
+                    .background(
+                        GeometryReader { proxy in
+                            Color.clear.preference(
+                                key: ScrollOffsetPreferenceKey.self,
+                                value: proxy.frame(in: .global).minY
+                            )
+                        }
                     )
-                }
-            )
+            } else {
+                Color.clear
+                    .frame(height: height)
+            }
+        }
     }
 }
