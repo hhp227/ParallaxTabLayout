@@ -15,6 +15,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.hhp227.parallaxlayout.R
 import com.hhp227.parallaxlayout.databinding.FragmentParallaxTabBinding
 import kotlin.collections.get
+import kotlin.math.abs
 
 class ParallaxTabFragment : Fragment() {
     private val fragmentList by lazy {
@@ -37,6 +38,11 @@ class ParallaxTabFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setNavAppBar(binding.toolbar)
+        binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val collapseRange = appBarLayout.totalScrollRange.takeIf { it > 0 } ?: return@addOnOffsetChangedListener
+            val collapseFraction = abs(verticalOffset).toFloat() / collapseRange
+            binding.image.alpha = 1f - collapseFraction.coerceIn(0f, 1f)
+        }
         binding.viewPager.apply {
             adapter = object : FragmentStateAdapter(this@ParallaxTabFragment) {
                 override fun getItemCount() = fragmentList.size
