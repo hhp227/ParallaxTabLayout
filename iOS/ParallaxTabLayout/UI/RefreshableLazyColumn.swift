@@ -29,6 +29,7 @@ struct RefreshableLazyColumn<Row: View>: View {
             }
             .padding(.top, headerHeight)
         }
+        .coordinateSpace(name: collapsingScrollCoordinateSpace)
     }
 
     init(
@@ -55,7 +56,7 @@ struct ScrollOffsetReader: View {
                 GeometryReader { proxy in
                     Color.clear.preference(
                         key: ScrollOffsetPreferenceKey.self,
-                        value: proxy.frame(in: .named("collapsing-scroll")).minY
+                        value: proxy.frame(in: .named(collapsingScrollCoordinateSpace)).minY
                     )
                 }
             } else {

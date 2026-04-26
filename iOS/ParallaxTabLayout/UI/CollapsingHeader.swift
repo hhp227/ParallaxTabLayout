@@ -1,5 +1,7 @@
 import SwiftUI
 
+let collapsingScrollCoordinateSpace = "collapsing-scroll"
+
 struct CollapsingAppBarState {
     let isExpanded: Bool
     let setExpanded: (Bool) -> Void
@@ -37,7 +39,6 @@ struct CollapsingListScaffold<Content: View>: View {
 
             ZStack(alignment: .top) {
                 content(headerHeight, appBarState)
-                    .coordinateSpace(name: "collapsing-scroll")
                     .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
                         collapseOffset = min(max(-offset, 0), maxCollapse)
                     }

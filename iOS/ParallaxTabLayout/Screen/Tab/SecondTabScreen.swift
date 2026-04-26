@@ -22,6 +22,7 @@ struct SecondTabScreen: View {
             }
             .padding(.top, headerHeight)
         }
+        .coordinateSpace(name: collapsingScrollCoordinateSpace)
         .onPreferenceChange(ScrollOffsetPreferenceKey.self) {
             if isActive {
                 scrollOffset = $0
