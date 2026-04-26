@@ -17,6 +17,8 @@ struct CollapsingListScaffold<Content: View>: View {
     let onTabSelected: (Int) -> Void
     let content: (_ headerHeight: CGFloat, _ appBarState: CollapsingAppBarState) -> Content
 
+    @State private var previousDragTranslationY: CGFloat = 0
+
     private let imageHeight: CGFloat = 256
     private let toolbarHeight: CGFloat = 56
     private let tabHeight: CGFloat = 48
@@ -36,11 +38,23 @@ struct CollapsingListScaffold<Content: View>: View {
                     collapseOffset = expanded ? 0 : maxCollapse
                 }
             )
+            let nestedScrollGesture = DragGesture(minimumDistance: 0, coordinateSpace: .global)
+                .onChanged { value in
+                    let deltaY = value.translation.height - previousDragTranslationY
+                    previousDragTranslationY = value.translation.height
+                    collapseOffset = min(max(collapseOffset - deltaY, 0), maxCollapse)
+                }
+                .onEnded { _ in
+                    previousDragTranslationY = 0
+                }
 
             ZStack(alignment: .top) {
                 content(headerHeight, appBarState)
                     .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
-                        collapseOffset = min(max(-offset, 0), maxCollapse)
+                        let scrolledOffset = max(-offset, 0)
+                        if scrolledOffset > 0.5 {
+                            collapseOffset = min(scrolledOffset, maxCollapse)
+                        }
                     }
 
                 HeaderView(
@@ -55,6 +69,7 @@ struct CollapsingListScaffold<Content: View>: View {
                     topInset: topInset
                 )
             }
+            .simultaneousGesture(nestedScrollGesture)
             .ignoresSafeArea(edges: .top)
         }
     }
