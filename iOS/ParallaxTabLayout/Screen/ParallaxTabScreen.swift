@@ -3,7 +3,6 @@ import SwiftUI
 struct ParallaxTabScreen: View {
     let title: String
 
-    @Environment(\.presentationMode) private var presentationMode
     @State private var selectedTab = 0
     @State private var collapseOffset: CGFloat = 0
     @State private var firstTabScrollOffset: CGFloat = 0
@@ -13,12 +12,12 @@ struct ParallaxTabScreen: View {
         ZStack(alignment: .bottomTrailing) {
             CollapsingListScaffold(
                 title: title,
-                navigationIcon: .back,
-                onNavigationClick: { presentationMode.wrappedValue.dismiss() },
+                navigationIcon: .none,
+                onNavigationClick: {},
                 showTabs: true,
                 selectedTab: $selectedTab,
                 collapseOffset: $collapseOffset,
-                onTabSelected: handleTabSelected
+                onTabSelected: { _ in }
             ) { headerHeight, appBarState in
                 ZStack {
                     FirstTabScreen(
@@ -45,14 +44,7 @@ struct ParallaxTabScreen: View {
                     .padding(16)
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationBarHiddenCompat()
+        .navigationTitle(title)
     }
 
-    private func handleTabSelected(_ tab: Int) {
-        let offset = tab == 0 ? firstTabScrollOffset : secondTabScrollOffset
-        if offset < -0.5 {
-            collapseOffset = CGFloat.greatestFiniteMagnitude
-        }
-    }
 }
