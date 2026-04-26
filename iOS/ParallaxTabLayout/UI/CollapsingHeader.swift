@@ -41,7 +41,7 @@ struct CollapsingListScaffold<Content: View>: View {
             )
 
             ZStack(alignment: .top) {
-                content(headerHeight, appBarState)
+                content(expandedHeight, appBarState)
                     .onPreferenceChange(ScrollOffsetPreferenceKey.self) { contentOffset in
                         guard !contentOffset.isNaN else { return }
 
