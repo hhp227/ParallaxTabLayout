@@ -26,7 +26,8 @@ struct CollapsingListScaffold<Content: View>: View {
             let topInset = proxy.safeAreaInsets.top
             let headerTop = proxy.frame(in: .global).minY
             let expandedHeight = topInset + imageHeight
-            let collapsedHeight = topInset + toolbarHeight + (showTabs ? tabHeight : 0)
+            let hasCollapsingToolbar = navigationIcon == .menu
+            let collapsedHeight = topInset + (hasCollapsingToolbar ? toolbarHeight : 0) + (showTabs ? tabHeight : 0)
             let maxCollapse = max(0, expandedHeight - collapsedHeight)
             let currentOffset = min(max(collapseOffset, 0), maxCollapse)
             let headerHeight = expandedHeight - currentOffset
@@ -84,12 +85,14 @@ private struct HeaderView: View {
 
             VStack(spacing: 0) {
                 Color.clear.frame(height: topInset)
-                AppToolbar(
-                    title: title,
-                    navigationIcon: navigationIcon,
-                    onNavigationClick: onNavigationClick,
-                    transparent: true
-                )
+                if navigationIcon == .menu {
+                    AppToolbar(
+                        title: title,
+                        navigationIcon: navigationIcon,
+                        onNavigationClick: onNavigationClick,
+                        transparent: true
+                    )
+                }
                 Spacer(minLength: 0)
                 if showTabs {
                     HStack(spacing: 0) {
