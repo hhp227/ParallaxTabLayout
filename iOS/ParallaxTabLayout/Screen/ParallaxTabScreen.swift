@@ -9,7 +9,7 @@ struct ParallaxTabScreen: View {
     @State private var secondTabScrollOffset: CGFloat = 0
 
     private var isCollapsed: Bool {
-        collapseOffset >= 151
+        collapseOffset >= 163
     }
 
     var body: some View {
@@ -21,7 +21,7 @@ struct ParallaxTabScreen: View {
                 showTabs: true,
                 selectedTab: $selectedTab,
                 collapseOffset: $collapseOffset,
-                onTabSelected: { _ in }
+                onTabSelected: { selectedTab = $0 }
             ) { headerHeight, appBarState in
                 ZStack {
                     FirstTabScreen(

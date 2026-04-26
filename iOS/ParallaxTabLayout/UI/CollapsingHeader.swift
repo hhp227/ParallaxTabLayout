@@ -17,6 +17,8 @@ struct CollapsingListScaffold<Content: View>: View {
     let onTabSelected: (Int) -> Void
     let content: (_ headerHeight: CGFloat, _ appBarState: CollapsingAppBarState) -> Content
 
+    @State private var ignoresNextExpansion = false
+
     private let imageHeight: CGFloat = 256
     private let toolbarHeight: CGFloat = 56
     private let tabHeight: CGFloat = 48
@@ -25,8 +27,9 @@ struct CollapsingListScaffold<Content: View>: View {
         GeometryReader { proxy in
             let topInset = proxy.safeAreaInsets.top
             let headerTop = proxy.frame(in: .global).minY
+            let collapsedToolbarHeight = navigationIcon == .back ? 44.0 : toolbarHeight
             let expandedHeight = topInset + imageHeight
-            let collapsedHeight = topInset + toolbarHeight + (showTabs ? tabHeight : 0)
+            let collapsedHeight = topInset + collapsedToolbarHeight + (showTabs ? tabHeight : 0)
             let maxCollapse = max(0, expandedHeight - collapsedHeight)
             let currentOffset = min(max(collapseOffset, 0), maxCollapse)
             let headerHeight = expandedHeight - currentOffset
@@ -45,7 +48,14 @@ struct CollapsingListScaffold<Content: View>: View {
 
                         let expandedHeaderBottom = headerTop + expandedHeight
                         let scrolledOffset = max(expandedHeaderBottom - itemTop, 0)
-                        collapseOffset = min(scrolledOffset, maxCollapse)
+                        let nextCollapseOffset = min(scrolledOffset, maxCollapse)
+                        if ignoresNextExpansion && nextCollapseOffset < collapseOffset {
+                            ignoresNextExpansion = false
+                            return
+                        }
+
+                        ignoresNextExpansion = false
+                        collapseOffset = nextCollapseOffset
                     }
 
                 HeaderView(
@@ -61,6 +71,9 @@ struct CollapsingListScaffold<Content: View>: View {
                 )
             }
             .ignoresSafeArea(edges: .top)
+            .onChange(of: selectedTab) { _ in
+                ignoresNextExpansion = true
+            }
         }
     }
 }
