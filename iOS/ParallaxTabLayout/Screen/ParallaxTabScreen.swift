@@ -8,6 +8,10 @@ struct ParallaxTabScreen: View {
     @State private var firstTabScrollOffset: CGFloat = 0
     @State private var secondTabScrollOffset: CGFloat = 0
 
+    private var isCollapsed: Bool {
+        collapseOffset >= 151
+    }
+
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             CollapsingListScaffold(
@@ -46,7 +50,8 @@ struct ParallaxTabScreen: View {
         }
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarTintColorCompat(collapseOffset > 0.5 ? .white : UIColor(Color.accentColor))
+        .navigationBarBackgroundColorCompat(isCollapsed ? UIColor(Color.accentColor) : .clear)
+        .navigationBarTintColorCompat(isCollapsed ? .white : UIColor(Color.accentColor))
     }
 
 }

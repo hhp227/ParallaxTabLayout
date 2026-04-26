@@ -18,6 +18,10 @@ extension View {
     func navigationBarTintColorCompat(_ color: UIColor) -> some View {
         background(NavigationBarTintColorView(color: color))
     }
+
+    func navigationBarBackgroundColorCompat(_ color: UIColor) -> some View {
+        background(NavigationBarBackgroundColorView(color: color))
+    }
 }
 
 private struct NavigationBarTintColorView: UIViewControllerRepresentable {
@@ -29,5 +33,29 @@ private struct NavigationBarTintColorView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
         uiViewController.navigationController?.navigationBar.tintColor = color
+    }
+}
+
+private struct NavigationBarBackgroundColorView: UIViewControllerRepresentable {
+    let color: UIColor
+
+    func makeUIViewController(context: Context) -> UIViewController {
+        UIViewController()
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        guard let navigationBar = uiViewController.navigationController?.navigationBar else { return }
+
+        let appearance = UINavigationBarAppearance()
+        if color.cgColor.alpha == 0 {
+            appearance.configureWithTransparentBackground()
+        } else {
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = color
+        }
+
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        navigationBar.compactAppearance = appearance
     }
 }
