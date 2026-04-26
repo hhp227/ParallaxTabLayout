@@ -36,6 +36,11 @@ class FirstFragment : Fragment() {
         }
         binding.progressBar.visibility = View.GONE
         binding.fab.visibility = View.GONE
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            binding.swipeRefreshLayout.postDelayed({
+                binding.swipeRefreshLayout.isRefreshing = false
+            }, 1_000L)
+        }
     }
 
     private class SimpleTextAdapter(

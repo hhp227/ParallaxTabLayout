@@ -40,7 +40,11 @@ class FirstTabFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.recyclerView.adapter = SimpleTextAdapter(viewModel.items)
         binding.progressBar.visibility = View.GONE
-        binding.swipeRefreshLayout.isEnabled = false
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            binding.swipeRefreshLayout.postDelayed({
+                binding.swipeRefreshLayout.isRefreshing = false
+            }, 1_000L)
+        }
     }
 
     fun isFirstItemVisible() = (binding.recyclerView.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition() == 0
