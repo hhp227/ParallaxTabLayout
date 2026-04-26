@@ -57,6 +57,8 @@ fun CollapsingListScaffold(
     selectedTab: Int = 0,
     onTabSelected: (Int) -> Unit = {},
     listState: LazyListState = rememberLazyListState(),
+    collapseOffsetPx: Float? = null,
+    onCollapseOffsetPxChange: (Float) -> Unit = {},
     content: @Composable (LazyListState, Dp, CollapsingAppBarState) -> Unit
 ) {
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -68,38 +70,47 @@ fun CollapsingListScaffold(
     val maxCollapsePx = with(density) {
         (expandedHeight - collapsedHeight).toPx().coerceAtLeast(0f)
     }
-    val collapseOffsetPx = remember(maxCollapsePx) { mutableFloatStateOf(0f) }
-    val appBarState = remember(maxCollapsePx) {
+    val internalCollapseOffsetPx = remember(maxCollapsePx) { mutableFloatStateOf(0f) }
+    fun currentCollapseOffsetPx(): Float = collapseOffsetPx ?: internalCollapseOffsetPx.floatValue
+    fun updateCollapseOffsetPx(value: Float) {
+        val coercedValue = value.coerceIn(0f, maxCollapsePx)
+
+        if (collapseOffsetPx == null) {
+            internalCollapseOffsetPx.floatValue = coercedValue
+        }
+        onCollapseOffsetPxChange(coercedValue)
+    }
+    val appBarState = remember(maxCollapsePx, collapseOffsetPx) {
         CollapsingAppBarState(
-            collapseOffsetPxProvider = { collapseOffsetPx.floatValue },
+            collapseOffsetPxProvider = { currentCollapseOffsetPx() },
             maxCollapsePxProvider = { maxCollapsePx },
-            setCollapseOffsetPx = { collapseOffsetPx.floatValue = it.coerceIn(0f, maxCollapsePx) }
+            setCollapseOffsetPx = ::updateCollapseOffsetPx
         )
     }
-    val nestedScrollConnection = remember(maxCollapsePx) {
+    val nestedScrollConnection = remember(maxCollapsePx, collapseOffsetPx) {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 if (available.y >= 0f) return Offset.Zero
 
-                val previousOffset = collapseOffsetPx.floatValue
+                val previousOffset = currentCollapseOffsetPx()
                 val newOffset = (previousOffset - available.y).coerceIn(0f, maxCollapsePx)
-                collapseOffsetPx.floatValue = newOffset
+                updateCollapseOffsetPx(newOffset)
                 return Offset(x = 0f, y = previousOffset - newOffset)
             }
 
             override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
                 if (available.y <= 0f) return Offset.Zero
 
-                val previousOffset = collapseOffsetPx.floatValue
+                val previousOffset = currentCollapseOffsetPx()
                 val newOffset = (previousOffset - available.y).coerceIn(0f, maxCollapsePx)
-                collapseOffsetPx.floatValue = newOffset
+                updateCollapseOffsetPx(newOffset)
                 return Offset(x = 0f, y = previousOffset - newOffset)
             }
         }
     }
-    val collapseFraction = if (maxCollapsePx == 0f) 1f else collapseOffsetPx.floatValue / maxCollapsePx
+    val collapseFraction = if (maxCollapsePx == 0f) 1f else currentCollapseOffsetPx() / maxCollapsePx
     val headerHeight = with(density) {
-        (expandedHeight.toPx() - collapseOffsetPx.floatValue).toDp()
+        (expandedHeight.toPx() - currentCollapseOffsetPx()).toDp()
     }
 
     Box(
