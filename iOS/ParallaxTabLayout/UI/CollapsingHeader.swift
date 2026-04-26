@@ -27,7 +27,7 @@ struct CollapsingListScaffold<Content: View>: View {
     var body: some View {
         GeometryReader { proxy in
             let topInset = proxy.safeAreaInsets.top
-            let collapsedToolbarHeight = navigationIcon == .back ? 44.0 : toolbarHeight
+            let collapsedToolbarHeight = navigationIcon == .back ? 0 : toolbarHeight
             let expandedHeight = topInset + imageHeight
             let collapsedHeight = topInset + collapsedToolbarHeight + (showTabs ? tabHeight : 0)
             let maxCollapse = max(0, expandedHeight - collapsedHeight)
