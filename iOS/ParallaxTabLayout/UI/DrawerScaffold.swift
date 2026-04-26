@@ -51,7 +51,7 @@ private struct DrawerHeader: View {
             Image(systemName: "person.crop.circle.fill")
                 .resizable()
                 .frame(width: 90, height: 90)
-                .foregroundStyle(Color.white)
+                .foregroundColorCompat(Color.white)
 
             VStack(alignment: .leading, spacing: 3) {
                 Spacer()
@@ -61,7 +61,7 @@ private struct DrawerHeader: View {
                     .font(.caption)
                     .padding(.bottom, 7)
             }
-            .foregroundStyle(Color.white)
+            .foregroundColorCompat(Color.white)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16)
         }

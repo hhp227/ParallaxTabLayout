@@ -1,19 +1,19 @@
 import SwiftUI
 
 struct DetailScreen: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
         VStack(spacing: 0) {
             AppToolbar(
                 title: "Detail",
                 navigationIcon: .back,
-                onNavigationClick: { dismiss() }
+                onNavigationClick: { presentationMode.wrappedValue.dismiss() }
             )
             Text("Hello blank fragment")
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
         .navigationBarBackButtonHidden(true)
-        .toolbar(.hidden, for: .navigationBar)
+        .navigationBarHiddenCompat()
     }
 }

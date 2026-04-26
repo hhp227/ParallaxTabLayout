@@ -125,7 +125,7 @@ private struct TabButton: View {
                 Spacer()
                 Text(title)
                     .font(.subheadline.weight(.medium))
-                    .foregroundStyle(isSelected ? Color.white : Color.white.opacity(0.82))
+                    .foregroundColorCompat(isSelected ? Color.white : Color.white.opacity(0.82))
                 Spacer()
                 Rectangle()
                     .fill(isSelected ? Color.black.opacity(0.7) : Color.clear)

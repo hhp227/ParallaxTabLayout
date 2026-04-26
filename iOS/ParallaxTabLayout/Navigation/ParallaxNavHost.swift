@@ -1,43 +1,56 @@
 import SwiftUI
 
-enum AppRoute: Hashable {
-    case detail
-    case parallaxTab(String)
-}
-
 enum MainDestination {
     case first
     case second
 }
 
 struct ParallaxNavHost: View {
-    @State private var path: [AppRoute] = []
     @State private var selectedDestination: MainDestination = .first
+    @State private var isDetailActive = false
+    @State private var parallaxTabTitle: String?
 
     var body: some View {
-        NavigationStack(path: $path) {
-            Group {
+        NavigationView {
+            ZStack {
                 switch selectedDestination {
                 case .first:
                     FirstScreen(
                         selectedDestination: $selectedDestination,
-                        onOpenDetail: { path.append(.detail) }
+                        onOpenDetail: { isDetailActive = true }
                     )
                 case .second:
                     SecondScreen(
                         selectedDestination: $selectedDestination,
-                        onOpenParallaxTab: { path.append(.parallaxTab($0)) }
+                        onOpenParallaxTab: { parallaxTabTitle = $0 }
                     )
                 }
-            }
-            .navigationDestination(for: AppRoute.self) { route in
-                switch route {
-                case .detail:
-                    DetailScreen()
-                case let .parallaxTab(group):
-                    ParallaxTabScreen(title: group.isEmpty ? "ParallaxTabFragment" : group)
+
+                NavigationLink(
+                    destination: DetailScreen(),
+                    isActive: $isDetailActive
+                ) {
+                    EmptyView()
                 }
+                .hidden()
+
+                NavigationLink(
+                    destination: ParallaxTabScreen(title: parallaxTabTitle?.isEmpty == false ? parallaxTabTitle! : "ParallaxTabFragment"),
+                    isActive: Binding(
+                        get: { parallaxTabTitle != nil },
+                        set: { isActive in
+                            if !isActive {
+                                parallaxTabTitle = nil
+                            }
+                        }
+                    )
+                ) {
+                    EmptyView()
+                }
+                .hidden()
             }
+            .navigationBarHiddenCompat()
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }

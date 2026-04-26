@@ -36,7 +36,7 @@ struct SecondScreen: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-        .toolbar(.hidden, for: .navigationBar)
+        .navigationBarHiddenCompat()
     }
 }
 
@@ -77,7 +77,7 @@ private struct GroupGridItem: View {
 
             Text(item)
                 .font(.system(size: 15))
-                .foregroundStyle(Color(uiColor: .darkGray))
+                .foregroundColorCompat(Color(uiColor: .darkGray))
                 .padding(.top, 10)
                 .padding(.horizontal, 10)
                 .frame(height: 65, alignment: .topLeading)

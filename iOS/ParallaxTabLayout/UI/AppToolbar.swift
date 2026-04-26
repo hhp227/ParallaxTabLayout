@@ -17,13 +17,13 @@ struct AppToolbar: View {
                 Image(systemName: navigationIcon == .menu ? "line.3.horizontal" : "chevron.left")
                     .font(.system(size: 20, weight: .semibold))
                     .frame(width: 56, height: 56)
-                    .foregroundStyle(Color.white)
+                    .foregroundColorCompat(Color.white)
             }
 
             Text(title)
                 .font(.title3.weight(.medium))
                 .lineLimit(1)
-                .foregroundStyle(Color.white)
+                .foregroundColorCompat(Color.white)
 
             Spacer()
         }
