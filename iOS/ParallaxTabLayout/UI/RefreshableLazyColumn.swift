@@ -31,7 +31,6 @@ struct RefreshableLazyColumn<Row: View>: View {
                 }
             }
         }
-        .ignoresSafeArea(edges: .top)
         .coordinateSpace(name: collapsingScrollCoordinateSpace)
     }
 

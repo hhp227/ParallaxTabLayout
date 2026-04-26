@@ -46,7 +46,7 @@ struct ParallaxTabScreen: View {
         }
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
-        .accentColor(collapseOffset > 0.5 ? Color.white : Color.accentColor)
+        .navigationBarTintColorCompat(collapseOffset > 0.5 ? .white : UIColor(Color.accentColor))
     }
 
 }

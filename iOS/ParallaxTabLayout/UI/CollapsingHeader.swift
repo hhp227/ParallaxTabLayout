@@ -25,8 +25,11 @@ struct CollapsingListScaffold<Content: View>: View {
         GeometryReader { proxy in
             let topInset = proxy.safeAreaInsets.top
             let headerTop = proxy.frame(in: .global).minY
-            let expandedHeight = topInset + imageHeight
-            let collapsedHeight = topInset + toolbarHeight + (showTabs ? tabHeight : 0)
+            let usesSystemNavigationBar = navigationIcon == .back
+            let headerTopInset = usesSystemNavigationBar ? 0 : topInset
+            let collapsedToolbarHeight = usesSystemNavigationBar ? 0 : toolbarHeight
+            let expandedHeight = headerTopInset + imageHeight
+            let collapsedHeight = headerTopInset + collapsedToolbarHeight + (showTabs ? tabHeight : 0)
             let maxCollapse = max(0, expandedHeight - collapsedHeight)
             let currentOffset = min(max(collapseOffset, 0), maxCollapse)
             let headerHeight = expandedHeight - currentOffset
@@ -57,7 +60,7 @@ struct CollapsingListScaffold<Content: View>: View {
                     onTabSelected: onTabSelected,
                     headerHeight: headerHeight,
                     imageOpacity: 1 - fraction,
-                    topInset: topInset
+                    topInset: headerTopInset
                 )
             }
             .ignoresSafeArea(edges: .top)
