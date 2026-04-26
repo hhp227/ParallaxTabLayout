@@ -63,7 +63,19 @@ struct CollapsingListScaffold<Content: View>: View {
                     topInset: headerTopInset
                 )
             }
-            .ignoresSafeArea(edges: .top)
+            .modifier(CollapsingSafeAreaModifier(ignoresTopSafeArea: !usesSystemNavigationBar))
+        }
+    }
+}
+
+private struct CollapsingSafeAreaModifier: ViewModifier {
+    let ignoresTopSafeArea: Bool
+
+    func body(content: Content) -> some View {
+        if ignoresTopSafeArea {
+            content.ignoresSafeArea(edges: .top)
+        } else {
+            content
         }
     }
 }
