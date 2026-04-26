@@ -13,11 +13,16 @@ struct AppToolbar: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            Button(action: buttonAction) {
-                Image(systemName: navigationIcon == .menu ? "line.3.horizontal" : "chevron.left")
-                    .font(.system(size: 20, weight: .semibold))
+            if navigationIcon == .menu {
+                Button(action: buttonAction) {
+                    Image(systemName: "line.3.horizontal")
+                        .font(.system(size: 20, weight: .semibold))
+                        .frame(width: 56, height: 56)
+                        .foregroundColorCompat(Color.white)
+                }
+            } else {
+                Color.clear
                     .frame(width: 56, height: 56)
-                    .foregroundColorCompat(Color.white)
             }
 
             Text(title)

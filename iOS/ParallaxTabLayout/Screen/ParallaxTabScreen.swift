@@ -12,7 +12,7 @@ struct ParallaxTabScreen: View {
         ZStack(alignment: .bottomTrailing) {
             CollapsingListScaffold(
                 title: title,
-                navigationIcon: .none,
+                navigationIcon: .back,
                 onNavigationClick: {},
                 showTabs: true,
                 selectedTab: $selectedTab,
