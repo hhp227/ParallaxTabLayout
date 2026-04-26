@@ -9,7 +9,7 @@ struct ParallaxTabScreen: View {
     @State private var secondTabScrollOffset: CGFloat = 0
 
     private var isCollapsed: Bool {
-        collapseOffset >= 207
+        collapseOffset >= 163
     }
 
     var body: some View {

@@ -18,7 +18,7 @@ struct CollapsingListScaffold<Content: View>: View {
     let content: (_ headerHeight: CGFloat, _ appBarState: CollapsingAppBarState) -> Content
 
     @State private var ignoresNextExpansion = false
-    @State private var isDragging = false
+    @State private var scrollOffset: CGFloat = 0
 
     private let imageHeight: CGFloat = 256
     private let toolbarHeight: CGFloat = 56
@@ -27,12 +27,13 @@ struct CollapsingListScaffold<Content: View>: View {
     var body: some View {
         GeometryReader { proxy in
             let topInset = proxy.safeAreaInsets.top
-            let collapsedToolbarHeight = navigationIcon == .back ? 0 : toolbarHeight
+            let collapsedToolbarHeight = navigationIcon == .back ? 44.0 : toolbarHeight
             let expandedHeight = topInset + imageHeight
             let collapsedHeight = topInset + collapsedToolbarHeight + (showTabs ? tabHeight : 0)
             let maxCollapse = max(0, expandedHeight - collapsedHeight)
             let currentOffset = min(max(collapseOffset, 0), maxCollapse)
             let headerHeight = expandedHeight - currentOffset
+            let contentTopPadding = expandedHeight - max(currentOffset - scrollOffset, 0)
             let fraction = maxCollapse == 0 ? 1 : currentOffset / maxCollapse
             let appBarState = CollapsingAppBarState(
                 isExpanded: currentOffset <= 0.5,
@@ -42,17 +43,15 @@ struct CollapsingListScaffold<Content: View>: View {
             )
 
             ZStack(alignment: .top) {
-                content(expandedHeight, appBarState)
+                content(contentTopPadding, appBarState)
                     .onPreferenceChange(ScrollOffsetPreferenceKey.self) { contentOffset in
                         guard !contentOffset.isNaN else { return }
 
                         let scrolledOffset = max(-contentOffset, 0)
+                        scrollOffset = min(scrolledOffset, maxCollapse)
                         let nextCollapseOffset = min(scrolledOffset, maxCollapse)
                         if ignoresNextExpansion && nextCollapseOffset < collapseOffset {
                             ignoresNextExpansion = false
-                            return
-                        }
-                        if nextCollapseOffset < collapseOffset && !isDragging {
                             return
                         }
 
@@ -76,11 +75,6 @@ struct CollapsingListScaffold<Content: View>: View {
             .onChange(of: selectedTab) { _ in
                 ignoresNextExpansion = true
             }
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in isDragging = true }
-                    .onEnded { _ in isDragging = false }
-            )
         }
     }
 }
