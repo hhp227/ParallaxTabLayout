@@ -21,15 +21,15 @@ struct RefreshableLazyColumn<Row: View>: View {
 
     private var content: some View {
         ScrollView {
+            CollapsingHeaderSpacer(
+                isScrollTrackingEnabled: isScrollTrackingEnabled
+            )
             LazyVStack(spacing: 0) {
-                CollapsingHeaderSpacer(
-                    height: headerHeight,
-                    isScrollTrackingEnabled: isScrollTrackingEnabled
-                )
                 ForEach(items, id: \.self) { item in
                     row(item)
                 }
             }
+            .padding(.top, headerHeight)
         }
         .coordinateSpace(name: collapsingScrollCoordinateSpace)
     }
