@@ -31,16 +31,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hhp227.compose.R
-import com.hhp227.compose.data.sampleItems
 import com.hhp227.compose.ui.AppToolbar
 import com.hhp227.compose.ui.DrawerScaffold
+import com.hhp227.compose.ui.NavigationIcon
 
 @Composable
 fun SecondScreen(
     selectedRoute: String,
     onNavigateDrawer: (String) -> Unit,
-    onOpenParallaxTab: (String) -> Unit
+    onOpenParallaxTab: (String) -> Unit,
+    viewModel: SecondViewModel = viewModel()
 ) {
     DrawerScaffold(
         selectedRoute = selectedRoute,
@@ -50,7 +52,7 @@ fun SecondScreen(
             topBar = {
                 AppToolbar(
                     title = "SecondFragment",
-                    navigationText = "Menu",
+                    navigationIcon = NavigationIcon.Menu,
                     onNavigationClick = openDrawer
                 )
             }
@@ -66,7 +68,7 @@ fun SecondScreen(
                     contentPadding = PaddingValues(start = 14.dp, end = 12.dp, top = 8.dp, bottom = 16.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(sampleItems()) { item ->
+                    items(viewModel.items) { item ->
                         GroupGridItem(item = item, onClick = { onOpenParallaxTab(item) })
                     }
                 }

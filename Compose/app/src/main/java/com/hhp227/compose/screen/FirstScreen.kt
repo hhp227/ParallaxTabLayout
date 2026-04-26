@@ -16,36 +16,37 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.hhp227.compose.data.sampleItems
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hhp227.compose.ui.CollapsingListScaffold
 import com.hhp227.compose.ui.DrawerScaffold
+import com.hhp227.compose.ui.NavigationIcon
 import com.hhp227.compose.ui.RefreshableLazyColumn
 
 @Composable
 fun FirstScreen(
     selectedRoute: String,
     onNavigateDrawer: (String) -> Unit,
-    onOpenDetail: () -> Unit
+    onOpenDetail: () -> Unit,
+    viewModel: FirstViewModel = viewModel()
 ) {
     DrawerScaffold(
         selectedRoute = selectedRoute,
         onNavigate = onNavigateDrawer
     ) { openDrawer ->
-        val items = sampleItems()
         Box(modifier = Modifier.fillMaxSize()) {
             CollapsingListScaffold(
                 title = "FirstFragment",
-                navigationText = "Menu",
+                navigationIcon = NavigationIcon.Menu,
                 onNavigationClick = openDrawer,
                 showTabs = false
-            ) { listState, headerHeight, isAppBarExpanded ->
+            ) { listState, headerHeight, appBarState ->
                 RefreshableLazyColumn(
                     state = listState,
                     contentPadding = PaddingValues(top = headerHeight),
                     modifier = Modifier.fillMaxSize(),
-                    enabled = isAppBarExpanded
+                    enabled = appBarState.isExpanded
                 ) {
-                    items(items) { item ->
+                    items(viewModel.items) { item ->
                         Text(
                             text = item,
                             modifier = Modifier

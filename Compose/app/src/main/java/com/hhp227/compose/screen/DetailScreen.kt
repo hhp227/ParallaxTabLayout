@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.hhp227.compose.ui.AppToolbar
+import com.hhp227.compose.ui.NavigationIcon
 
 @Composable
 fun DetailScreen(onBack: () -> Unit) {
@@ -14,7 +15,7 @@ fun DetailScreen(onBack: () -> Unit) {
         topBar = {
             AppToolbar(
                 title = "Detail",
-                navigationText = "Back",
+                navigationIcon = NavigationIcon.Back,
                 onNavigationClick = onBack
             )
         }

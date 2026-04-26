@@ -35,17 +35,30 @@ import androidx.compose.ui.unit.dp
 import com.hhp227.compose.R
 import kotlin.math.max
 
+class CollapsingAppBarState internal constructor(
+    private val collapseOffsetPxProvider: () -> Float,
+    private val maxCollapsePxProvider: () -> Float,
+    private val setCollapseOffsetPx: (Float) -> Unit
+) {
+    val isExpanded: Boolean
+        get() = collapseOffsetPxProvider() <= 0.5f
+
+    fun setExpanded(expanded: Boolean) {
+        setCollapseOffsetPx(if (expanded) 0f else maxCollapsePxProvider())
+    }
+}
+
 @Composable
 fun CollapsingListScaffold(
     title: String,
-    navigationText: String,
+    navigationIcon: NavigationIcon,
     onNavigationClick: () -> Unit,
     showTabs: Boolean,
     selectedTab: Int = 0,
     onTabSelected: (Int) -> Unit = {},
-    content: @Composable (LazyListState, Dp, Boolean) -> Unit
+    listState: LazyListState = rememberLazyListState(),
+    content: @Composable (LazyListState, Dp, CollapsingAppBarState) -> Unit
 ) {
-    val listState = rememberLazyListState()
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val toolbarHeight = 56.dp
     val tabHeight = if (showTabs) 48.dp else 0.dp
@@ -56,6 +69,13 @@ fun CollapsingListScaffold(
         (expandedHeight - collapsedHeight).toPx().coerceAtLeast(0f)
     }
     val collapseOffsetPx = remember(maxCollapsePx) { mutableFloatStateOf(0f) }
+    val appBarState = remember(maxCollapsePx) {
+        CollapsingAppBarState(
+            collapseOffsetPxProvider = { collapseOffsetPx.floatValue },
+            maxCollapsePxProvider = { maxCollapsePx },
+            setCollapseOffsetPx = { collapseOffsetPx.floatValue = it.coerceIn(0f, maxCollapsePx) }
+        )
+    }
     val nestedScrollConnection = remember(maxCollapsePx) {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -78,7 +98,6 @@ fun CollapsingListScaffold(
         }
     }
     val collapseFraction = if (maxCollapsePx == 0f) 1f else collapseOffsetPx.floatValue / maxCollapsePx
-    val isAppBarExpanded = collapseOffsetPx.floatValue <= 0.5f
     val headerHeight = with(density) {
         (expandedHeight.toPx() - collapseOffsetPx.floatValue).toDp()
     }
@@ -88,7 +107,7 @@ fun CollapsingListScaffold(
             .fillMaxSize()
             .nestedScroll(nestedScrollConnection)
     ) {
-        content(listState, headerHeight, isAppBarExpanded)
+        content(listState, headerHeight, appBarState)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -106,7 +125,7 @@ fun CollapsingListScaffold(
             Column(modifier = Modifier.fillMaxSize()) {
                 AppToolbar(
                     title = title,
-                    navigationText = navigationText,
+                    navigationIcon = navigationIcon,
                     onNavigationClick = onNavigationClick,
                     transparent = true
                 )
